@@ -16,7 +16,7 @@ DROP TABLE IF EXISTS genre;
 CREATE TABLE genre (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL COMMENT 'Название жанра',
-  UNIQUE unique_name(name(10))
+  UNIQUE unique_name4(name(10))
 ) COMMENT = 'Жанры сериалов';
 
 DROP TABLE IF EXISTS actors;
@@ -29,14 +29,14 @@ DROP TABLE IF EXISTS tags;
 CREATE TABLE tags (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
-  UNIQUE unique_name(name(10))
+  UNIQUE unique_name3(name(10))
 ) COMMENT = 'тэги';
 
 DROP TABLE IF EXISTS canal;
 CREATE TABLE canal (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL COMMENT 'каналы',
-  UNIQUE unique_name(name(10))
+  UNIQUE unique_name2(name(10))
 );
 
 DROP TABLE IF EXISTS author;
@@ -167,7 +167,7 @@ create table schedule_serials(
 	 Primary key (user_id, serials_id),
 	 foreign key (user_id) references users(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	 foreign key (serials_id) references serials(id) ON DELETE CASCADE ON UPDATE CASCADE
-) COMMENT = 'статус просмотр по каждому сериалу';
+) COMMENT = 'статус просмотра по каждому сериалу';
 
 drop table if exists views;
 create table views(
@@ -177,9 +177,76 @@ create table views(
 	Primary key (user_id, seria_id),
 	foreign key (user_id) references users(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	foreign key (seria_id) references seria(id) ON DELETE CASCADE ON UPDATE CASCADE	
-)COMMENT = 'лайки серий';
+)COMMENT = 'просмотры серий';
 
+drop table if exists find_actors;
+create table find_actors(
+	actors_id BIGINT UNSIGNED NOT NULL,
+	serials_id BIGINT UNSIGNED NOT NULL,
+	primary key (actors_id, serials_id),
+	index (actors_id),
+	index (serials_id),
+	foreign key (actors_id) references actors(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	foreign key (serials_id) references serials(id) ON DELETE CASCADE ON UPDATE CASCADE	
+)COMMENT = 'список актеров по фильмам';
 
+drop table if exists find_author;
+create table find_author(
+	author_id BIGINT UNSIGNED NOT NULL,
+	serials_id BIGINT UNSIGNED NOT NULL,
+	primary key (author_id, serials_id),
+	index (author_id),
+	index (serials_id),
+	foreign key (author_id) references author(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	foreign key (serials_id) references serials(id) ON DELETE CASCADE ON UPDATE CASCADE	
+)COMMENT = 'список создетелей по фильмам';
 
+drop table if exists find_tags;
+create table find_tags(
+	tags_id BIGINT UNSIGNED NOT NULL,
+	serials_id BIGINT UNSIGNED NOT NULL,
+	primary key (tags_id, serials_id),
+	index (tags_id),
+	index (serials_id),
+	foreign key (tags_id) references tags(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	foreign key (serials_id) references serials(id) ON DELETE CASCADE ON UPDATE CASCADE	
+)COMMENT = 'список фильмов по тэгам';
 
+drop table if exists find_genre;
+create table find_genre(
+	genre_id BIGINT UNSIGNED NOT NULL,
+	serials_id BIGINT UNSIGNED NOT NULL,
+	primary key (genre_id, serials_id),
+	index (genre_id),
+	index (serials_id),
+	foreign key (genre_id) references genre(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	foreign key (serials_id) references serials(id) ON DELETE CASCADE ON UPDATE CASCADE	
+)COMMENT = 'список фильмов по жанрам';
+
+drop table if exists find_canal;
+create table find_canal(
+	canal_id BIGINT UNSIGNED NOT NULL,
+	serials_id BIGINT UNSIGNED NOT NULL,
+	primary key (canal_id, serials_id),
+	index (canal_id),
+	index (serials_id),
+	foreign key (canal_id) references canal(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	foreign key (serials_id) references serials(id) ON DELETE CASCADE ON UPDATE CASCADE	
+)COMMENT = 'список актеров по фильмам';
+
+drop table if exists find_seria_serials;
+create table find_seria_serials(
+	serials_two_id BIGINT UNSIGNED NOT NULL,
+	serials_id BIGINT UNSIGNED NOT NULL,
+	primary key (serials_two_id, serials_id),
+	index (serials_two_id),
+	index (serials_id),
+	foreign key (serials_two_id) references serials(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	foreign key (serials_id) references serials(id) ON DELETE CASCADE ON UPDATE CASCADE	
+)COMMENT = 'список сериалов из одной сюжетной линии';
+
+drop table if exists find;
+create table find(
+	finded text
+)ENGINE=ARCHIVE;
 
