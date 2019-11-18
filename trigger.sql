@@ -20,4 +20,14 @@ BEGIN
 END//
 delimiter ;*/
 
-
+Drop trigger if exists seriafor ;
+delimiter //
+CREATE TRIGGER seriafor After insert on seria for each ROW
+BEGIN
+	declare x decimal;
+    declare y int;
+   	set y = (select serials_id from seasons where new.seasons_id = id );
+	set x = (select  sum(seria) from allseria where serials = y group by serials);
+	update courseSql.serials set serials.allepisods = x where serials.id = y;
+END//
+delimiter ;

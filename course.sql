@@ -287,6 +287,24 @@ BEGIN
 	update courseSql.serials set serials.allseasons = x where serials.id = New.serials_id;
 END//
 delimiter ;
+
+create or replace view allseria (serials ,seasons, seasons_id, seria)
+as
+select t.serials_id, t.seasons_num, t.seasons_id, max(t.seria_num) from (select seasons.serials_id, seasons.seasons_num , seria.seasons_id, seria.seria_num from seasons left join  seria on seria.seasons_id = seasons.id)as t group by t.serials_id, t.seasons_num;
+
+Drop trigger if exists seriafor ;
+delimiter //
+CREATE TRIGGER seriafor After insert on seria for each ROW
+BEGIN
+	declare x decimal;
+    declare y int;
+   	set y = (select serials_id from seasons where new.seasons_id = id );
+	set x = (select  sum(seria) from allseria where serials = y group by serials);
+	update courseSql.serials set serials.allepisods = x where serials.id = y;
+END//
+delimiter ;
+
+
 /* данные
 */
 
@@ -837,8 +855,7 @@ INSERT INTO `serials` VALUES ('1',NULL,'tempora','blanditiis','Molestiae volupta
 ; 
 
 INSERT INTO `seasons` VALUES ('1','1','1','2008-11-15 14:41:47','Quas aut cupiditate rem suscipit tempora veniam.',NULL),
-('2','2','1','2007-03-20 03:04:05','Dolorum expedita velit non in inventore voluptas quaerat rerum.',NULL),
-('25','2','2','2007-03-20 03:04:05','Dolorum expedita velit non in inventore voluptas quaerat rerum.',NULL),
+('2','1','2','2007-03-20 03:04:05','Dolorum expedita velit non in inventore voluptas quaerat rerum.',NULL),
 ('3','3','1','2002-12-07 20:30:43','Dolor totam et et quia repellat sint.',NULL),
 ('4','4','1','2004-04-26 18:27:30','Optio est esse dicta.',NULL),
 ('5','5','1','1994-12-07 19:52:39','Deserunt inventore et qui velit.',NULL),
@@ -863,9 +880,9 @@ INSERT INTO `seasons` VALUES ('1','1','1','2008-11-15 14:41:47','Quas aut cupidi
 ('24','24','4','1997-11-03 01:37:08','Atque alias ea voluptas voluptas voluptates.',NULL)
 ; 
 
-INSERT INTO `seria` VALUES ('1','1','9','1989-09-28 12:16:40','nesciunt'),
+INSERT INTO `seria` VALUES ('1','2','4','1989-09-28 12:16:40','nesciunt'),
 ('2','2','2','2018-06-03 05:13:31','debitis'),
-('3','3','8','1979-07-17 19:27:38','omnis'),
+('3','2','104','1979-07-17 19:27:38','omnis'),
 ('4','4','6','1993-01-30 20:09:33','odio'),
 ('5','5','7','1983-07-13 00:37:32','ducimus'),
 ('6','6','8','2019-09-12 10:22:58','unde'),
@@ -877,7 +894,7 @@ INSERT INTO `seria` VALUES ('1','1','9','1989-09-28 12:16:40','nesciunt'),
 ('12','12','9','1998-07-19 08:32:09','eum'),
 ('13','13','7','1984-03-02 20:58:59','quisquam'),
 ('14','14','5','1985-04-21 08:34:29','consectetur'),
-('15','15','7','1989-02-07 12:31:08','quis'),
+('15','15','3','1989-02-07 12:31:08','quis'),
 ('16','16','7','1998-08-28 15:34:16','et'),
 ('17','17','9','1999-01-14 03:49:31','praesentium'),
 ('18','18','1','2006-10-20 07:08:57','aut'),
@@ -993,7 +1010,7 @@ INSERT INTO `seria` VALUES ('1','1','9','1989-09-28 12:16:40','nesciunt'),
 ('1422','22','2','1992-08-10 03:27:07','perspiciatis'),
 ('1423','23','2','1994-11-20 15:34:33','odio'),
 ('1424','24','5','1974-08-18 07:23:48','quia'),
-('1602','2','4','1981-04-16 16:46:38','omnis'),
+('1602','2','59','1981-04-16 16:46:38','omnis'),
 ('1608','8','10','1989-08-08 10:23:19','eius'),
 ('1609','9','6','1979-10-16 22:17:37','commodi'),
 ('1610','10','1','1996-09-07 06:53:37','ut'),
