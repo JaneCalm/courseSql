@@ -1,6 +1,6 @@
 use courseSql;
 
-/*Drop trigger if exists reitfor ;
+Drop trigger if exists reitfor ;
 delimiter //
 CREATE TRIGGER reitfor After insert on likes for each ROW
 BEGIN
@@ -18,7 +18,7 @@ BEGIN
 	set x = (select  max(seasons_num) from seasons where serials_id = New.serials_id group by serials_id);
 	update courseSql.serials set serials.allseasons = x where serials.id = New.serials_id;
 END//
-delimiter ;*/
+delimiter ;
 
 Drop trigger if exists seriafor ;
 delimiter //
@@ -31,3 +31,6 @@ BEGIN
 	update courseSql.serials set serials.allepisods = x where serials.id = y;
 END//
 delimiter ;
+
+
+

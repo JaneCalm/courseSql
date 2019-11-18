@@ -304,6 +304,21 @@ BEGIN
 END//
 delimiter ;
 
+create or replace view emailid(email, id)
+as
+select messages.email, users.id from  messages join users where messages.email=users.email group by users.id;
+
+DROP PROCEDURE if exists actor;  
+
+delimiter //
+
+CREATE PROCEDURE `actor` (in x varchar(255)) 
+DETERMINISTIC 
+BEGIN 
+    select serials.nameR, actors.name from serials join find_actors join actors on serials.id =find_actors.serials_id and actors.name = x and actors.id = find_actors.actors_id;
+END// 
+
+delimiter ;
 
 /* данные
 */
@@ -722,8 +737,8 @@ INSERT INTO `genre` VALUES ('1','modi'),
 
 
 
-INSERT INTO `messages` VALUES ('1','woodrow.kris@example.net',NULL,'Sed non et id eligendi modi est vel. Pariatur sed autem temporibus mollitia minus voluptas. Placeat in et sit nisi et voluptatem porro voluptatem.','1981-04-01 03:59:43'),
-('2','alec.rogahn@example.net',NULL,'Natus perspiciatis molestias consectetur possimus reiciendis quisquam. Dolores aut hic consequatur tempora voluptas tempore veritatis. Fugit maiores dolor commodi nihil consequatur temporibus nulla ut. Ea et veniam debitis tempora iste recusandae quam. Corporis qui consequatur voluptate sint.','1973-11-05 00:17:46'),
+INSERT INTO `messages` VALUES ('1','bbogan@example.com',NULL,'Sed non et id eligendi modi est vel. Pariatur sed autem temporibus mollitia minus voluptas. Placeat in et sit nisi et voluptatem porro voluptatem.','1981-04-01 03:59:43'),
+('2','bbogan@example.com',NULL,'Natus perspiciatis molestias consectetur possimus reiciendis quisquam. Dolores aut hic consequatur tempora voluptas tempore veritatis. Fugit maiores dolor commodi nihil consequatur temporibus nulla ut. Ea et veniam debitis tempora iste recusandae quam. Corporis qui consequatur voluptate sint.','1973-11-05 00:17:46'),
 ('3','dstokes@example.net',NULL,'Harum eos corrupti iste repellat praesentium quis magnam. Enim reprehenderit aspernatur autem unde cum aperiam. Fugit dolores quia doloribus neque.','1979-08-08 02:07:54'),
 ('4','thammes@example.net',NULL,'Sint dolores libero minus qui aut. Laborum pariatur occaecati enim labore ducimus inventore est dolor.','2004-11-21 05:07:11'),
 ('5','morar.chaz@example.com',NULL,'Quia quis officia et impedit ipsa sint. Officia odio a est sunt vel. Quod a optio quibusdam.','1977-02-02 12:36:45'),
