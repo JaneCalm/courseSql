@@ -19,11 +19,14 @@ CREATE TABLE genre (
   UNIQUE unique_name4(name(10))
 ) COMMENT = 'Жанры сериалов';
 
+
+
 DROP TABLE IF EXISTS actors;
 CREATE TABLE actors (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL UNIQUE COMMENT 'Имя актера'
 ) COMMENT = 'Актеры';
+
 
 DROP TABLE IF EXISTS tags;
 CREATE TABLE tags (
@@ -32,6 +35,7 @@ CREATE TABLE tags (
   UNIQUE unique_name3(name(10))
 ) COMMENT = 'тэги';
 
+
 DROP TABLE IF EXISTS canal;
 CREATE TABLE canal (
   id SERIAL PRIMARY KEY,
@@ -39,11 +43,13 @@ CREATE TABLE canal (
   UNIQUE unique_name2(name(10))
 );
 
+
 DROP TABLE IF EXISTS author;
 CREATE TABLE author (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL UNIQUE COMMENT 'создатель идеи'
 );
+
 
 drop table if exists users;
 create table users(
@@ -57,12 +63,13 @@ create table users(
 	INDEX (firstname, lastname)
 )COMMENT = 'пользователи';
 
+
 drop table if exists schedule;
 create table schedule(
 	 user_id serial PRIMARY KEY,
-	 delay ENUM('1', '2', '3', '4', '5', '6', '7','8', '9', '10') COMMENT 'задержка дней рассписания',
+	 delay ENUM('1', '2', '3', '4', '5', '6', '7','8', '9', '10') COMMENT 'задержка дней расписания',
 	 opened ENUM('10', '11', '12', '13', '14', '15', '16','17', '18', '19', '20') COMMENT 'количество отображаемых серий', 
-	 loaded ENUM('5', '6', '7', '8', '9', '10', '11','12', '13', '14', '15') COMMENT 'количество подгружаемых серий', 
+	 loaded ENUM('5', '6', '7', '8', '9', '10', '11','12', '13', '14', '15') COMMENT 'количество подгружаемых серий',
 	 foreign key (user_id) references users(id) ON DELETE CASCADE ON UPDATE CASCADE
 ) COMMENT = 'общие настройки расписания пользователя';
 
@@ -70,10 +77,11 @@ drop table if exists messages;
 create table messages(
 	id SERIAL PRIMARY KEY,
 	email VARCHAR(120) not null,
-	user_id BIGINT UNSIGNED unique,
+	user_id BIGINT UNSIGNED,
 	body TEXT,
 	created_at DATETIME DEFAULT NOW(),
 	index(email),
+	index(user_id),
 	foreign key (user_id) references users(id) ON DELETE set null ON UPDATE CASCADE
 ) COMMENT = 'Сообщения отправленные из формы сайта';
 
@@ -100,6 +108,10 @@ CREATE TABLE serials(
   timeline int COMMENT 'длительность серии',
   allepisods int UNSIGNED,
   allseasons int UNSIGNED,
+  index (nameR),
+  index (nameE),
+  index (created_at),
+  index (reit),
   foreign key (picture_id) references picture(id) ON DELETE set null ON UPDATE CASCADE
 ) COMMENT = 'Сериалы';
 
@@ -108,7 +120,8 @@ drop table if exists news;
 create table news(
 	id SERIAL PRIMARY KEY,
 	news_text TEXT NOT NULL,
-	serials_id BIGINT UNSIGNED,	
+	serials_id BIGINT UNSIGNED,
+	index (serials_id),
 	foreign key (serials_id) references serials(id) ON DELETE set null ON UPDATE CASCADE
 );
 
@@ -118,6 +131,7 @@ create table likes(
 	user_id BIGINT UNSIGNED NOT NULL,
 	serials_id BIGINT UNSIGNED NOT NULL,
 	raiting_a ENUM ('1', '2', '3', '4', '5' ,'6', '7', '8', '9', '10'),
+	index (user_id),
 	primary key (user_id, serials_id),
 	foreign key (user_id) references users(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	foreign key (serials_id) references serials(id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -127,12 +141,11 @@ drop table if exists seasons;
 create table seasons(
 	id SERIAL PRIMARY KEY,
 	serials_id BIGINT UNSIGNED NOT NULL,
-	seasons_id BIGINT UNSIGNED NOT NULL,
-	num int UNSIGNED not null,
+	seasons_num BIGINT UNSIGNED NOT NULL,
 	data_start DATETIME,
 	seasons_text TEXT,
 	allepisods int UNSIGNED,
-	UNIQUE (serials_id, seasons_id),
+	UNIQUE (serials_id, seasons_num),
 	foreign key (serials_id) references serials(id) ON DELETE CASCADE ON UPDATE CASCADE
 )COMMENT = 'сезоны';
 
@@ -140,11 +153,10 @@ drop table if exists seria;
 create table seria(
 	id SERIAL PRIMARY KEY,
 	seasons_id BIGINT UNSIGNED NOT NULL,
-	seria_id BIGINT UNSIGNED NOT NULL,
-	num int UNSIGNED not null,
+	seria_num BIGINT UNSIGNED NOT NULL,
 	data_start DATETIME,
 	name VARCHAR(255),
-	UNIQUE (seasons_id, seria_id),
+	UNIQUE (seasons_id, seria_num),
 	foreign key (seasons_id) references seasons(id) ON DELETE CASCADE ON UPDATE CASCADE
 )COMMENT = 'серии';
 
@@ -152,8 +164,9 @@ drop table if exists likes_b;
 create table likes_b(
 	user_id BIGINT UNSIGNED NOT NULL,
 	seria_id BIGINT UNSIGNED NOT NULL,
-	raiting_b CHAR(1),
+	raiting_b CHAR(1) DEFAULT (0),
 	Primary key (user_id, seria_id),
+	index (user_id),
 	foreign key (user_id) references users(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	foreign key (seria_id) references seria(id) ON DELETE CASCADE ON UPDATE CASCADE	
 )COMMENT = 'лайки серий';
@@ -165,6 +178,7 @@ create table schedule_serials(
 	 status ENUM('смотрю', 'посмотрела', 'бросила просмотр', 'приостановила просмотр', 'планирую посмотреть') COMMENT 'статус просмотра сериала',
 	 massege TEXT,
 	 Primary key (user_id, serials_id),
+	 index (user_id),
 	 foreign key (user_id) references users(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	 foreign key (serials_id) references serials(id) ON DELETE CASCADE ON UPDATE CASCADE
 ) COMMENT = 'статус просмотра по каждому сериалу';
@@ -173,8 +187,10 @@ drop table if exists views;
 create table views(
 	user_id BIGINT UNSIGNED NOT NULL,
 	seria_id BIGINT UNSIGNED NOT NULL,
-	view CHAR(1),
+	view CHAR(1) DEFAULT (0),
 	Primary key (user_id, seria_id),
+	index (user_id),
+	index (seria_id),
 	foreign key (user_id) references users(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	foreign key (seria_id) references seria(id) ON DELETE CASCADE ON UPDATE CASCADE	
 )COMMENT = 'просмотры серий';
@@ -249,4 +265,6 @@ drop table if exists find;
 create table find(
 	finded text
 )ENGINE=ARCHIVE;
+
+
 
